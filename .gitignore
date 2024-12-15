@@ -22,3 +22,5 @@ missing
 src/.deps/
 src/.dirstamp
 src/.libs/
+.cache/*
+.DS_Store

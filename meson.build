@@ -22,17 +22,11 @@ ldflags = [
 
 sources = [
   'src/tcomb.c',
+  'src/simd_sse2.c'
 ]
 
 
-host_cpu_family = host_machine.cpu_family()
-
-if host_cpu_family.startswith('x86')
-  cflags += ['-mfpmath=sse', '-msse2', '-DTCOMB_X86=1']
-  
-  sources += ['src/simd_sse2.c']
-endif
-
+host_cpu_family = host_machine.cpu_family()  
 
 host_system = host_machine.system()
 

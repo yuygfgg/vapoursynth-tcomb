@@ -1,0 +1,5 @@
+{
+    "sonarlint.pathToCompileCommands": "${workspaceFolder}/builddir/compile_commands.json",
+    "C_Cpp.default.compileCommands": "/Users/a1/vapoursynth-tcomb/builddir/compile_commands.json",
+    "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild"
+}

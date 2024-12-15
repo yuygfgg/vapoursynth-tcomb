@@ -37,7 +37,7 @@
 #define max4(a,b,c,d) VSMAX(VSMAX(a,b),VSMAX(c,d))
 
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
 // Implemented in simd_sse2.c
 extern void buildFinalMask_sse2( const uint8_t *s1p, const uint8_t *s2p, const uint8_t *m1p, uint8_t *dstp, intptr_t stride, intptr_t width, intptr_t height, intptr_t thresh);
 extern void absDiff_sse2( const uint8_t *srcp1, const uint8_t *srcp2, uint8_t *dstp, intptr_t stride, intptr_t width, intptr_t height);
@@ -126,7 +126,7 @@ static void MinMax(const VSFrameRef *src, VSFrameRef *dmin, VSFrameRef *dmax, VS
 
         const int thresh = b == 0 ? 2 : 8;
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
         minMax_sse2(srcp, dminp, dmaxp, width, height, src_pitch, dmin_pitch, thresh);
 #else
         const uint8_t *srcpp = srcp - src_pitch;
@@ -286,7 +286,7 @@ static void buildFinalMask(const VSFrameRef *s1, const VSFrameRef *s2, const VSF
 
         const int thresh = b == 0 ? d->othreshl : d->othreshc;
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
         buildFinalMask_sse2(s1p, s2p, m1p, dstp, stride, width, height, thresh);
 #else
         for (int y = 0; y < height; ++y) {
@@ -323,7 +323,7 @@ static void andNeighborsInPlace(VSFrameRef *src, const VSAPI *vsapi)
     srcp += src_pitch;
     srcpn += src_pitch;
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
     const int widtha = (width % 16) ? ((width / 16) * 16) : width - 16;
 
     andNeighborsInPlace_sse2(srcp + 16, widtha - 16, height - 2, src_pitch);
@@ -369,7 +369,7 @@ static void absDiff(const VSFrameRef *src1, const VSFrameRef *src2, VSFrameRef *
     const int width = vsapi->getFrameWidth(src1, 0);
     const int stride = vsapi->getStride(src1, 0);
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
     absDiff_sse2(srcp1, srcp2, dstp, stride, width, height);
 #else
     for (int y = 0; y < height; ++y) {
@@ -393,7 +393,7 @@ static void absDiffAndMinMask(const VSFrameRef *src1, const VSFrameRef *src2, VS
     const int width = vsapi->getFrameWidth(src1, 0);
     const int stride = vsapi->getStride(src1, 0);
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
     absDiffAndMinMask_sse2(srcp1, srcp2, dstp, stride, width, height);
 #else
     for (int y = 0; y < height; ++y) {
@@ -422,7 +422,7 @@ static void absDiffAndMinMaskThresh(const VSFrameRef *src1, const VSFrameRef *sr
 
     const int thresh = d->fthreshl;
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
     absDiffAndMinMaskThresh_sse2(srcp1, srcp2, dstp, stride, width, height, thresh);
 #else
     for (int y = 0; y < height; ++y) {
@@ -459,7 +459,7 @@ static void checkOscillation5(const VSFrameRef *p2, const VSFrameRef *p1, const 
 
         const int thresh = b == 0 ? d->othreshl : d->othreshc;
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
         checkOscillation5_sse2(p2p, p1p, s1p, n1p, n2p, dstp, stride, width, height, thresh);
 #else
         for (int y = 0; y < height; ++y) {
@@ -496,7 +496,7 @@ static void calcAverages(const VSFrameRef *s1, const VSFrameRef *s2, VSFrameRef 
         const uint8_t *s2p = vsapi->getReadPtr(s2, b);
         uint8_t *dstp = vsapi->getWritePtr(dst, b);
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
         calcAverages_sse2(s1p, s2p, dstp, stride, width, height);
 #else
         for (int y = 0; y < height; ++y) {
@@ -526,7 +526,7 @@ static void checkAvgOscCorrelation(const VSFrameRef *s1, const VSFrameRef *s2, c
 
         const int thresh = b == 0 ? d->fthreshl : d->fthreshc;
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
         checkAvgOscCorrelation_sse2(s1p, s2p, s3p, s4p, dstp, stride, width, height, thresh);
 #else
         for (int y = 0; y < height; ++y) {
@@ -558,7 +558,7 @@ static void or3Masks(const VSFrameRef *s1, const VSFrameRef *s2, const VSFrameRe
         const uint8_t *s3p = vsapi->getReadPtr(s3, b);
         uint8_t *dstp = vsapi->getWritePtr(dst, b);
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
         or3Masks_sse2(s1p, s2p, s3p, dstp, stride, width, height);
 #else
         for (int y = 0; y < height; ++y) {
@@ -584,7 +584,7 @@ static void orAndMasks(const VSFrameRef *s1, const VSFrameRef *s2, VSFrameRef *d
     const uint8_t *s2p = vsapi->getReadPtr(s2, 0);
     uint8_t *dstp = vsapi->getWritePtr(dst, 0);
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
     orAndMasks_sse2(s1p, s2p, dstp, stride, width, height);
 #else
     for (int y = 0; y < height; ++y) {
@@ -608,7 +608,7 @@ static void andMasks(const VSFrameRef *s1, const VSFrameRef *s2, VSFrameRef *dst
     const uint8_t *s2p = vsapi->getReadPtr(s2, 0);
     uint8_t *dstp = vsapi->getWritePtr(dst, 0);
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
     andMasks_sse2(s1p, s2p, dstp, stride, width, height);
 #else
     for (int y = 0; y < height; ++y) {
@@ -636,7 +636,7 @@ static int checkSceneChange(const VSFrameRef *s1, const VSFrameRef *s2, TCombDat
 
     int64_t diff = 0;
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
     checkSceneChange_sse2(s1p, s2p, height, width, stride, &diff);
 #else
     for (int y = 0; y < height; ++y) {
@@ -666,7 +666,7 @@ static void VerticalBlur3(const VSFrameRef *src, VSFrameRef *dst, const VSAPI *v
     const int width = vsapi->getFrameWidth(src, 0);
     const int height = vsapi->getFrameHeight(src, 0);
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
     verticalBlur3_sse2(srcp, dstp, stride, width, height);
 #else
     const uint8_t *srcpp = srcp - stride;
@@ -715,7 +715,7 @@ static void HorizontalBlur3(const VSFrameRef *src, VSFrameRef *dst, const VSAPI 
     const int width = vsapi->getFrameWidth(src, 0);
     const int height = vsapi->getFrameHeight(src, 0);
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
     if (width >= 16) {
         const int widtha = (width / 16) * 16;
 
@@ -769,7 +769,7 @@ static void HorizontalBlur6(const VSFrameRef *src, VSFrameRef *dst, const VSAPI 
     const int width = vsapi->getFrameWidth(src, 0);
     const int height = vsapi->getFrameHeight(src, 0);
 
-#ifdef TCOMB_X86
+#if defined(TCOMB_X86) || defined(__ARM_NEON__)
     if (width >= 16) {
         const int widtha = (width / 16) * 16;
 

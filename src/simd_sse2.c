@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <emmintrin.h>
+#include "sse2neon.h"
 
 
 #define zeroes _mm_setzero_si128()
